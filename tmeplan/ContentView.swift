@@ -9,16 +9,26 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @State var tabviewselection: Int = 0;
-   
+    @Environment(AppHandler.self) private var handler
+
     
     var body: some View {
-        TabView(selection: $tabviewselection) {
-            Tab("Timetable", systemImage: "tablecells", value: 0) {
-                TimetableView()
+        TabView(selection: Binding(
+            get: { handler.tabViewSelection },
+            set: { handler.tabViewSelection = $0 }
+        )) {
+            if (handler.isTeacherModeEnabled) {
+                Tab("Plan lekcji (Nauczyciel)", systemImage: "tablecells", value: 0) {
+                    TeacherTimetableView()
+                }
+            } else {
+                Tab("Plan lekcji", systemImage: "tablecells", value: 0) {
+                    TimetableView()
+                }
             }
-//            Tab("Substitution", systemImage: "person.3.sequence.fill", value: 1) {
-//                
+            
+//            Tab("Substitution", systemImage: "person.3.sequence.fill", value: 2) {
+//
 //            }
         }
     }

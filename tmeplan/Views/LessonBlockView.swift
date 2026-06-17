@@ -60,7 +60,7 @@ struct LessonBlockView: View {
                     HStack {
                         Text(lesson[0].group!).fontWeight(.light).foregroundStyle(Color.gray)
                         Spacer()
-                        Text(lesson[0].classroom).fontWeight(.light).foregroundStyle(Color.gray)
+                        Text(lesson[0].classroom ?? " ").fontWeight(.light).foregroundStyle(Color.gray)
                         
                     }
                 }
@@ -68,7 +68,7 @@ struct LessonBlockView: View {
                     HStack {
                         Text("")
                         Spacer()
-                        Text(lesson[0].classroom).fontWeight(.light).foregroundStyle(Color.gray)
+                        Text(lesson[0].classroom ?? " ").fontWeight(.light).foregroundStyle(Color.gray)
                         Spacer()
                         Text("")
                     }
@@ -99,7 +99,7 @@ struct LessonBlockView: View {
                         }
                         HStack {
                             Spacer()
-                            Text(l.classroom).fontWeight(.light).foregroundStyle(Color.gray)
+                            Text(l.classroom ?? " ").fontWeight(.light).foregroundStyle(Color.gray)
                             Spacer()
                         }
                     }

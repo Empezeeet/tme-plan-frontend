@@ -1,23 +1,24 @@
 //
-//  TimetableView.swift
+//  TeacherTimetableView.swift
 //  tmeplan
 //
-//  Created by Mateusz Pawełko on 24/05/2026.
+//  Created by Mateusz Pawełko on 17/06/2026.
 //
 
 import SwiftUI
 
-struct TimetableView: View {
+struct TeacherTimetableView: View {
     @Environment(AppHandler.self) private var handler
     
     var body: some View {
         NavigationStack {
-            TimetableContent(handler: handler)
-                .navigationTitle(handler.getShortClassName(classId: handler.selectedClassId) ?? "Error")
+            TeacherTimetableContent(handler: handler)
+                .navigationTitle(handler.getTeacherName(teacherID: handler.selectedTeacherId) ?? "Nauczyciel")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
-                        ClassMenu(handler: handler)
+                        TeacherSelectionMenu(handler: handler)
+                        
                     }
                     ToolbarItem(placement: .topBarTrailing) {
                         SettingsMenu(handler: handler)
@@ -34,9 +35,14 @@ private struct SettingsMenu: View {
         Menu {
             Button {
                 Task {
-                    await handler.setTecherMode(!handler.isTeacherModeEnabled);
+                    await handler.setTecherMode(!handler.isTeacherModeEnabled)
+                    if (handler.isTeacherModeEnabled) {
+                        handler.tabViewSelection = 1;
+                    } else {
+                        handler.tabViewSelection = 0;
+                    }
                 }
-                
+               
             } label: {
                 if handler.isTeacherModeEnabled {
                     Text("Wyłącz tryb nauczyciela")
@@ -45,15 +51,15 @@ private struct SettingsMenu: View {
                 }
             }
             Button {
-                if (handler.selectedClassId != handler.defaultClassId) {
-                    handler.setDefaultClass(classId: handler.selectedClassId)
+                if (handler.defaultTeacherId == nil || handler.defaultTeacherId != handler.selectedTeacherId) {
+                    handler.setDefaultTeacher(teacherId: handler.selectedTeacherId)
                 }
             } label: {
-                // set default class
-                if (handler.selectedClassId == handler.defaultClassId) {
-                    Text("Ustawiono jako domyślną klasę")
+                // set default teacher
+                if (handler.defaultTeacherId == nil || handler.defaultTeacherId != handler.selectedTeacherId) {
+                    Text("Ustaw domyślnego nauczyciela")
                 } else {
-                    Text("Ustaw jako domyślną klasę")
+                    Text("Ustawiono domyślnego nauczyciela")
                 }
             }
         } label: {
@@ -61,7 +67,7 @@ private struct SettingsMenu: View {
         }
     }
 }
-private struct TimetableContent: View {
+private struct TeacherTimetableContent: View {
     let handler: AppHandler
     
     var body: some View {
@@ -80,6 +86,7 @@ private struct TimetableContent: View {
                 }
                 Spacer()
             } else {
+                // if no lessons at current day, show that there are no lessons
                 LessonList(lessons: handler.lessons)
             }
         }
@@ -97,13 +104,11 @@ private struct DayPicker: View {
                 get: { handler.daySelector },
                 set: { handler.daySelector = $0 }
             )) {
-             
-                ForEach(DayEnum.allCases) { day in
-                    Text(day == handler.daySelector ? day.fullName : day.shortName)
-                        .tag(day)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                }
+                Text("pon").tag(DayEnum.Monday)
+                Text("wt").tag(DayEnum.Tuesday)
+                Text("sr").tag(DayEnum.Wednesday)
+                Text("cz").tag(DayEnum.Thursday)
+                Text("pt").tag(DayEnum.Friday)
             }
             .pickerStyle(.segmented)
             Spacer()
@@ -112,16 +117,16 @@ private struct DayPicker: View {
     }
 }
 
-private struct ClassMenu: View {
+private struct TeacherSelectionMenu: View {
     let handler: AppHandler
     
     var body: some View {
         Menu {
-            ForEach(handler.classNames, id: \.self) { classname in
+            ForEach(handler.teacherNames, id: \.self) { teacher in
                 Button {
-                    Task { await handler.selectClass(handler.getClassId(className: classname) ?? 0) }
+                    Task { await handler.selectTeacher(handler.getTeacherId(teacher) ?? 0)}
                 } label: {
-                    Text(classname)
+                    Text(teacher)
                 }
             }
         } label: {
@@ -134,13 +139,24 @@ private struct LessonList: View {
     let lessons: [[Lesson]]
     
     var body: some View {
-        List(lessons.filter { !$0.isEmpty }, id: \.self) { lessonBlock in
-            LessonBlockView(l: lessonBlock)
+        if (lessons.filter { !$0.isEmpty }.isEmpty) {
+            VStack {
+                Spacer()
+                VStack(spacing: 12) {
+                    Text("Brak lekcji dzisiaj 😁").foregroundStyle(.gray)
+                }
+                Spacer()
+            }
+            
+        } else {
+            List(lessons.filter { !$0.isEmpty }, id: \.self) { lessonBlock in
+                LessonBlockView(l: lessonBlock)
+            }
         }
+        
     }
 }
 
 #Preview {
-    TimetableView()
-        .environment(AppHandler.getInstance())
+    TeacherTimetableView()
 }
