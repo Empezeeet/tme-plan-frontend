@@ -27,9 +27,9 @@ struct ContentView: View {
                 }
             }
             
-//            Tab("Substitution", systemImage: "person.3.sequence.fill", value: 2) {
-//
-//            }
+            Tab("Zastępstwa (Uczeń)", systemImage: "person.3.sequence.fill", value: 2) {
+                SubstitutionView()
+            }
         }
     }
 }

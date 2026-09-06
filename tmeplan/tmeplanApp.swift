@@ -190,4 +190,7 @@ class AppHandler {
         }
         isLoading = false
     }
+    func getSubstitutions() -> [Lesson] {
+        API
+    }
 }

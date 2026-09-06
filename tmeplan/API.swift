@@ -20,6 +20,9 @@ struct Lesson: Codable, Hashable {
     var classroom: String?;
     var end_time: String;
 }
+struct Substitution: Codable, Hashable {
+    
+}
 
 
 class Day: Codable {
@@ -50,6 +53,30 @@ class API {
     private let days: [String] = ["Pn", "Wt", "Sr", "Czw", "Pt"]
     private init() {
         
+    }
+    public func getSubstitutions(day: DayEnum) async -> [Lesson] {
+        var res: [Lesson] = [];
+        
+        var components = URLComponents(string: baseURL + "subs")
+        guard let url = components?.url else {
+            print("getSubstitutions error 1")
+            return [];
+        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                print("backend API error. getSubstitutions error 2")
+                return [];
+            }
+            res = try JSONDecoder().decode()
+        }
+        
+        
+        
+        
+        
+        return res;
     }
     public func getTeacherList() async -> TeacherList? {
         var res: TeacherList? = nil;
